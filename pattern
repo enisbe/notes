@@ -1,1 +1,18 @@
- pattern = r'\b(?!\d{2}/\d{2}/\d{4}\b)(?![\d,.]+\b)\d+\b'
+import re
+
+def extract_integers(text):
+    # Remove dates in various formats
+    no_dates_text = re.sub(
+        r'\b(\d{4}-\d{2}-\d{2})\b'    # YYYY-MM-DD
+        r'|\b(\d{2}/\d{2}/\d{4})\b'   # MM/DD/YYYY
+        r'|\b(\d{1,2}/\d{1,2}/\d{2,4})\b',  # M/D/YY or MM/DD/YYYY or M/D/YYYY or MM/DD/YY
+        '',
+        text
+    )
+
+    # Remove floats with dot or comma as separator
+    no_dates_no_floats_text = re.sub(r'\b\d+[.,]\d+\b', '', no_dates_text)
+
+    # Match any sequence of digits
+    matches = re.findall(r'\b\d+\b', no_dates_no_floats_text)
+    return [int(match) for match in matches]
