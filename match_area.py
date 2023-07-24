@@ -163,7 +163,12 @@ def name_in_sentence(name, sentence):
                 max_similarity = similarity
 
     return max_similarity
-
+similarity = name_in_sentence('John Doe', 'This check is for John Doe.')
+print(similarity)  # Output: 100
+similarity = name_in_sentence('John Doe', 'The recipient is Johm Doe.')
+print(similarity)  # Output: 89
+similarity = name_in_sentence('John Doe', 'Doe, John is the recipient.')
+print(similarity)  # Output: 100
 
 def clean_text(text):
     chars_to_remove = [",", ".", "'"]
