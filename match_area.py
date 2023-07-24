@@ -130,3 +130,25 @@ def get_recipient(check_text):
     # is separated by a space or new line. Change this as needed.
     recipient = check_text[end:].split()[0]
     return recipient
+
+
+from fuzzywuzzy import fuzz
+
+def name_in_sentence(name, sentence):
+    # Split the name and the sentence into words
+    name_parts = name.split(' ')
+    sentence_parts = sentence.split(' ')
+
+    # Initialize the maximum similarity to 0
+    max_similarity = 0
+
+    # Compare every part of the name to every part of the sentence
+    for part1 in name_parts:
+        for part2 in sentence_parts:
+            similarity = fuzz.ratio(part1, part2)
+            
+            # If this is the maximum similarity found so far, update max_similarity
+            if similarity > max_similarity:
+                max_similarity = similarity
+
+    return max_similarity
