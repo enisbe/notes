@@ -184,3 +184,18 @@ def remove_single_letter_words(text):
 text = "I am John Doe and I live on a 1234 Main St."
 cleaned_text = remove_single_letter_words(text)
 print(cleaned_text)
+
+
+
+import re
+
+def clean_spaces(text):
+    # Replace multiple spaces with single space
+    text = re.sub(' +', ' ', text)
+    # Strip leading and trailing spaces
+    text = text.strip()
+    return text
+
+text = "  I   am   John   Doe   and   I   live   on   a   1234   Main   St.   "
+cleaned_text = clean_spaces(text)
+print(cleaned_text)  # Output: "I am John Doe and I live on a 1234 Main St."
