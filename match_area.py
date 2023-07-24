@@ -204,3 +204,32 @@ def clean_spaces(text):
 text = "  I   am   John   Doe   and   I   live   on   a   1234   Main   St.   "
 cleaned_text = clean_spaces(text)
 print(cleaned_text)  # Output: "I am John Doe and I live on a 1234 Main St."
+
+
+
+
+def pairwise(iterable):
+    """Generate pairs of words from a list."""
+    a, b = iterable[:-1], iterable[1:]
+    return list(zip(a, b))
+
+sentence = "This is a simple sentence"
+words = sentence.split()
+word_pairs = pairwise(words)
+
+print(word_pairs)  # [('This', 'is'), ('is', 'a'), ('a', 'simple'), ('simple', 'sentence')]
+
+
+from fuzzywuzzy import fuzz
+
+for pair in word_pairs:
+    similarity = fuzz.ratio(*pair)
+    print(f"Similarity between '{pair[0]}' and '{pair[1]}' is {similarity}")
+
+
+
+import itertools
+
+def all_pairs(iterable):
+    """Generate all pairs of words from a list."""
+    return list(itertools.product(iterable, repeat=2))
