@@ -174,3 +174,13 @@ def clean_text(text):
 text = "John's address is 1234 Main St., Anytown, USA."
 cleaned_text = clean_text(text)
 print(cleaned_text)
+
+
+import re
+
+def remove_single_letter_words(text):
+    return re.sub(r'\b\w\b', '', text)
+
+text = "I am John Doe and I live on a 1234 Main St."
+cleaned_text = remove_single_letter_words(text)
+print(cleaned_text)
