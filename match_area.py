@@ -98,3 +98,35 @@ def find_best_match_box(target_box, boxes):
         best_match_box = find_closest_box(target_box, boxes)
 
     return best_match_box
+
+
+
+from word2number import w2n
+
+def is_number(string):
+    try:
+        num = w2n.word_to_num(string)
+        return True
+    except ValueError:
+        return False
+
+print(is_number("Two hundred")) # Output: True
+print(is_number("Three thousand")) # Output: True
+print(is_number("Hello world")) # Output: False
+
+def get_recipient(check_text):
+    # Find the position of the start of the target string
+    start = check_text.find("Pay to the Order of")
+    
+    # If the target string is not found, return an indication of failure
+    if start == -1:
+        return None
+
+    # Calculate the position of the end of the target string
+    end = start + len("Pay to the Order of")
+
+    # Extract and return the next string in the text
+    # We assume here that the recipient's name is the next string and 
+    # is separated by a space or new line. Change this as needed.
+    recipient = check_text[end:].split()[0]
+    return recipient
