@@ -36,6 +36,17 @@ def find_closest_box(target_box, boxes):
             closest_distance = total_difference
             closest_box = box
 
+
+    def clean_text(text):
+    chars_to_remove = [",", ".", "'"]
+    for char in chars_to_remove:
+        text = text.replace(char, "")
+    return text
+
+text = "John's address is 1234 Main St., Anytown, USA."
+cleaned_text = clean_text(text)
+print(cleaned_text)
+
     return closest_box
 
 # Get all paragraph bounding boxes
