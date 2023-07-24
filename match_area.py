@@ -163,3 +163,14 @@ def name_in_sentence(name, sentence):
                 max_similarity = similarity
 
     return max_similarity
+
+
+def clean_text(text):
+    chars_to_remove = [",", ".", "'"]
+    for char in chars_to_remove:
+        text = text.replace(char, "")
+    return text
+
+text = "John's address is 1234 Main St., Anytown, USA."
+cleaned_text = clean_text(text)
+print(cleaned_text)
