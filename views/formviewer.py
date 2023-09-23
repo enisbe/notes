@@ -1,10 +1,20 @@
-pn.extension('tabulator')
 
+import pandas as pd
+import data
+import panel as pn
+import numpy as np
+import pandas as pd
+from datetime import datetime 
+
+pn.extension()
+pn.extension('tabulator')
+pn.extension(notifications=True)
 
 class FormSidebar:
-    def __init__(self, model, features_df):
+    def __init__(self, model, features_df, process_queue = pd.DataFrame()):
         self.model = model
         self.features_df = features_df
+        self.process_queue = process_queue
         self.model_options = self.features_df['Model ID'].unique().tolist()
         self.all_features  = self.features_df['Variable'].unique().tolist()
         
@@ -123,10 +133,75 @@ class FormSidebar:
       
 
     def ok_func(self, event):
-        pass
+
+        current_features = self.get_current_model(self.model)
+        current_vars =current_features[self.model].tolist()
     
+        add_features = self.add_features_input.value
+        remove_features = self.remove_features_input.value
+        
+        for f in add_features:
+            if f not in current_vars:
+                current_vars.append(f)
+        for f in remove_features:
+            if f in remove_features:
+                current_vars.remove(f)
+        
+        new_id = self.model + "_1"
+        
+        # record = {
+        # "model_id": [new_id],
+        # "features": [current_vars],
+        # }
+        
+        #  = pd.concat([self.process_queue, new_model], ignore_index=True)
+        # new_model =  pd.DataFrame(record)                 
+        
+        added_to_queue = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        index = len(self.process_queue)
+        
+        self.process_queue.loc[index] = [new_id, 'run_new_model', current_vars, added_to_queue] 
+        pn.state.notifications.success(f'{new_id} Added to Queue .', duration=2000)
+        self.clear_and_disable()
+        
+        
     def cancel_func(self, event):
         self.clear_and_disable()
+
+        
+        
+        
+def create_app():
+    import data
+    performance_df = data.get_performace_df()
+    summary_df = data.get_summary_df()
+    model_ids, df = data.get_model_df()
+
+    global_vars = {
+    'current_active_tab': 0  ,
+    'info_max_height': 200,
+    'plot_height': 400,
+    }
+    process_queue = pd.DataFrame(columns=["model_id", "features"])
+
+    form = FormSidebar('101', summary_df, process_queue)
+    return form 
+
+     
     
-a = FormSidebar('101', summary_df)
-a.view()
+if __name__=="__main__":
+    
+    
+    import data
+    import os 
+
+    os.environ['BOKEH_ALLOW_WS_ORIGIN'] = '10.0.0.58,localhost'
+    
+    # app = create_app()
+    # server = pn.serve(create_app, port=8001, show=True, admin=True)
+    # server = pn.serve(create_app, port=8001, show=True, admin=True)
+
+    # modelSelectorView.view()        
+
+    a = FormSidebar('101', summary_df)
+    a.view()
