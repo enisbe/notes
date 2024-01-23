@@ -1,0 +1,24 @@
+Introduction
+Good morning, and good afternoon, everyone. Welcome to our Python workshop. Today, our goal is to introduce you to the powerful capabilities of Python and to demonstrate how it can be integrated into your daily activities, tasks, and workflows.
+ 
+Based on the survey responses I received from the question I sent out last night, it's clear that we have a technically skilled audience. It seems that at least 50 attendees have prior experience with programming languages, which is excellent. This indicates that many of you are already familiar with some aspects of programming.
+ 
+Our agenda today is to begin with the basics. We will guide you through setting up Python and initiating your first steps with it. This will be particularly beneficial for those who have never used Python before, providing a great opportunity to get up to speed. Following this, we will move into a more hands-on session. We'll demonstrate basic fPython operations and delve into specific, practical use cases. These examples will help you understand how Python can be effectively incorporated into your existing processes.
+ 
+My hope is that you will come out of the training with a few things how you can improve your process with Python.
+
+Agenda
+
+With that said, I'll spend some time making a case for Python. Why choose Python? Why do we need Python and not something else? 
+ 
+Hopefully, if I have convinced you on that, we'll go over the development environment and what you need to install Python and get it running on your computer and in the cloud. 
+ 
+Then we'll have a little bit of hands-on application of Python and use the Python programming language. 
+ 
+We'll discuss some use cases in Python, specifically how to use and integrate Python with Excel and how to get and leverage data with Python SQL. These are kinds of practical applications in hands-on. Hopefully, we'll give you an idea of where Python can be leveraged in your own processes. 
+ 
+And then, I'll cover some of the more advanced topics. Eventually, as you progress in your Python journey, you will most likely hit some performance bottlenecks. I want to address this in this session or slide. How can you handle it? Where do you need to go when that happens? 
+ 
+Then we'll touch base on cloud computing and learning resources. Just something that they will provide for you to kind of go to if you need to. If you want to explore this journey.
+
+
