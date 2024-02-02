@@ -97,4 +97,18 @@ instance_name = 'your-instance-name'
 extract_scheduler_name_from_resource_policies(project_id, zone, instance_name)
 
 
+from google.cloud import compute_v1
 
+def list_all_instances(project_id):
+    compute_client = compute_v1.InstancesClient()
+    # The `aggregated_list` method returns a dictionary with zone names as keys and instances as values
+    agg_list = compute_client.aggregated_list(project=project_id)
+
+    for zone, response in agg_list:
+        if response.instances:
+            for instance in response.instances:
+                print(f"Instance name: {instance.name}, Zone: {zone}, Status: {instance.status}")
+
+# Replace 'your-project-id' with your actual Google Cloud project ID
+project_id = 'your-project-id'
+list_all_instances(project_id)
