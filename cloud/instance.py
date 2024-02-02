@@ -37,6 +37,64 @@ scheduling_enabled = response['scheduling']['automaticRestart']
 if scheduling_enabled:
   # Use CLI to get the actual schedule (assuming instance names align)
   schedule_output = subprocess.check_output(["gcloud", "compute", "instances", "describe", "INSTANCE_NAME", "--project", "your-project-id", "--format", "value(scheduling.automaticRestart.schedule)"]).decode("utf-8")
+    
   print("Schedule:", schedule_output)
 else:
   print("Instance is not attached to any schedule.")
+
+
+from google.cloud import compute_v1
+
+def check_instance_schedule(instance_name, project_id, zone):
+    compute_client = compute_v1.InstancesClient()
+    instance = compute_client.get(project=project_id, zone=zone, instance=instance_name)
+
+    # Check labels
+    labels = instance.labels
+    if 'schedule' in labels:
+        print(f"Instance {instance_name} has a scheduling label: {labels['schedule']}")
+
+    # Check metadata
+    metadata = instance.metadata
+    for item in metadata.items:
+        if 'schedule' in item.key:
+            print(f"Instance {instance_name} has scheduling metadata: {item.key} = {item.value}")
+
+project_id = 'your-project-id'
+zone = 'your-zone'
+instance_name = 'your-instance-name'
+
+check_instance_schedule(instance_name, project_id, zone)
+
+
+
+
+
+
+from google.cloud import compute_v1
+import re
+
+def extract_scheduler_name_from_resource_policies(project_id, zone, instance_name):
+    compute_client = compute_v1.InstancesClient()
+    instance = compute_client.get(project=project_id, zone=zone, instance=instance_name)
+
+    # Check if instance has resource policies attached
+    if instance.resource_policies:
+        for policy_url in instance.resource_policies:
+            # Extract the scheduler name from the URL
+            match = re.search(r'/resourcePolicies/([^/]+)$', policy_url)
+            if match:
+                scheduler_name = match.group(1)
+                print(f"Scheduler name extracted: {scheduler_name}")
+    else:
+        print(f"No resource policies found for instance '{instance_name}'.")
+
+# Replace these variables with your actual project ID, zone, and instance name
+project_id = 'your-project-id'
+zone = 'your-zone'
+instance_name = 'your-instance-name'
+
+extract_scheduler_name_from_resource_policies(project_id, zone, instance_name)
+
+
+
