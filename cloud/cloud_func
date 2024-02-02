@@ -1,0 +1,162 @@
+import google.api_core.exceptions
+from googleapiclient import discovery
+
+def check_and_start_instance(request):
+    # Replace with your project ID and zone
+    project_id = 'your-project-id'
+    zone = 'your-instance-zone'
+
+    # Instance name to check
+    instance_name = 'your-instance-name'
+
+    compute = discovery.build('compute', 'v1')
+
+    try:
+        instances = compute.instances().list(project=project_id, zone=zone).execute()
+        for instance in instances['items']:
+            if instance['name'] == instance_name:
+                if instance['status'] != 'RUNNING':
+                    print(f'Starting instance: {instance_name}')
+                    compute.instances().start(project=project_id, zone=zone, instance=instance_name).execute()
+                break
+    except google.api_core.exceptions.NotFound:
+        print(f'Instance not found: {instance_name}')
+
+    return 'Instance check completed.'
+
+
+gcloud functions deploy check_and_start_instance \
+    --runtime python39 \
+    --trigger-http \
+    --allow-unauthenticated
+
+
+
+2. Cloud Scheduler Setup:
+
+a. Create a job using the gcloud CLI:
+
+gcloud scheduler jobs create http check-instance-job \
+    --schedule "every 15 minutes" \
+    --uri "https://REGION-PROJECT_ID.cloudfunctions.net/check_and_start_instance" \
+    --http-method GET
+
+
+
+Here's a setup and code to execute a Cloud Function with Cloud Scheduler to check and start an instance:
+
+1. Cloud Function Setup:
+
+a. Create a Python file for your function:
+
+Python
+import google.api_core.exceptions
+from googleapiclient import discovery
+
+def check_and_start_instance(request):
+    # Replace with your project ID and zone
+    project_id = 'your-project-id'
+    zone = 'your-instance-zone'
+
+    # Instance name to check
+    instance_name = 'your-instance-name'
+
+    compute = discovery.build('compute', 'v1')
+
+    try:
+        instances = compute.instances().list(project=project_id, zone=zone).execute()
+        for instance in instances['items']:
+            if instance['name'] == instance_name:
+                if instance['status'] != 'RUNNING':
+                    print(f'Starting instance: {instance_name}')
+                    compute.instances().start(project=project_id, zone=zone, instance=instance_name).execute()
+                break
+    except google.api_core.exceptions.NotFound:
+        print(f'Instance not found: {instance_name}')
+
+    return 'Instance check completed.'
+Use code with caution. Learn more
+b. Deploy the function using the gcloud CLI:
+
+Bash
+gcloud functions deploy check_and_start_instance \
+    --runtime python39 \
+    --trigger-http \
+    --allow-unauthenticated
+Use code with caution. Learn more
+2. Cloud Scheduler Setup:
+
+a. Create a job using the gcloud CLI:
+
+Bash
+gcloud scheduler jobs create http check-instance-job \
+    --schedule "every 15 minutes" \
+    --uri "https://REGION-PROJECT_ID.cloudfunctions.net/check_and_start_instance" \
+    --http-method GET
+Use code with caution. Learn more
+Replace REGION and PROJECT_ID with your values.
+
+That's it! Now your function will be triggered every 15 minutes to check the instance status and start it if not running.
+
+Remember:
+
+Grant the Cloud Function service account appropriate permissions to manage Compute Engine instances.
+Adjust the code with your specific project ID, zone, and instance name.
+Consider error handling and logging for a more robust solution.
+
+
+
+No, those libraries are not installed by default in Cloud Functions. You'll need to explicitly include them in your deployment package. Here's how:
+
+1. Create a requirements.txt file in your function's directory:
+
+google-api-core
+google-api-python-client
+
+2. Deploy your function using the --requirements flag:
+
+gcloud functions deploy check_and_start_instance \
+    --runtime python39 \
+    --trigger-http \
+    --allow-unauthenticated \
+    --requirements requirements.txt
+
+
+
+
+
+There are two ways to activate the appropriate service account for your Cloud Function to access Google Cloud APIs:
+
+1. Setting the service account during deployment:
+
+Using the Cloud Console:
+Go to the Cloud Functions page in the Google Cloud Console.
+Select your function.
+Click "Edit" and then "Runtime settings."
+In the "Service account" dropdown, select the service account you want to use.
+Click "Deploy."
+Using the gcloud CLI:
+Run the following command, replacing FUNCTION_NAME, SERVICE_ACCOUNT_EMAIL and PROJECT_ID with your values:
+
+
+gcloud functions deploy FUNCTION_NAME \
+    --runtime python39 \
+    --trigger-http \
+    --allow-unauthenticated \
+    --service-account SERVICE_ACCOUNT_EMAIL@PROJECT_ID.iam.gserviceaccount.com
+
+
+"Additionally, remember to activate the appropriate service account for your function to access Google Cloud APIs."
+
+How do you do this?
+
+
+2. Granting the function's default service account necessary permissions:
+
+By default, Cloud Functions uses a service account named service-PROJECT_NUMBER@gcf-admin-robot.iam.gserviceaccount.com.
+You need to grant this service account the necessary IAM permissions to access the specific Google Cloud APIs your function uses.
+You can do this in the Cloud Console or using the gcloud CLI.
+Here are some resources to help you grant permissions:
+
+Cloud Functions IAM documentation: https://cloud.google.com/functions/docs/reference/iam/roles
+Granting access to Google Cloud APIs using IAM: https://cloud.google.com/iam/docs/overview
