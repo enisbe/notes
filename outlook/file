@@ -1,0 +1,89 @@
+Sub CreateNewAppointment()
+    Dim objOutlook As Outlook.Application
+    Dim objAppointment As Outlook.AppointmentItem
+
+    Set objOutlook = New Outlook.Application
+    Set objAppointment = objOutlook.CreateItem(olAppointmentItem)
+
+    With objAppointment
+        .Subject = "Your Subject Here"
+        .Location = "Your Location Here"
+        .Start = Now + 1 ' Schedule for 1 day from now. Adjust as needed.
+        .Duration = 60 ' Duration in minutes (60 minutes in this example)
+        .Body = "Details about the appointment."
+        .ReminderSet = True
+        .ReminderMinutesBeforeStart = 15 ' Set a reminder 15 minutes before start
+        .Save
+    End With
+End Sub
+
+
+Sub GetCalendarItems()
+    Dim objOutlook As Outlook.Application
+    Dim objNamespace As Outlook.Namespace
+    Dim objFolder As Outlook.Folder
+    Dim objItem As Object
+    Dim objAppointment As Outlook.AppointmentItem
+
+    Set objOutlook = New Outlook.Application
+    Set objNamespace = objOutlook.GetNamespace("MAPI")
+
+    ' Assuming the Calendar is in your default mailbox, adjust if it's not
+    Set objFolder = objNamespace.GetDefaultFolder(olFolderCalendar)
+
+    For Each objItem In objFolder.Items
+        If TypeName(objItem) = "AppointmentItem" Then
+            Set objAppointment = objItem
+
+            ' Output appointment details to the Immediate Window (Ctrl+G in VBA editor)
+            Debug.Print "Subject: " & objAppointment.Subject
+            Debug.Print "Start: " & objAppointment.Start
+            Debug.Print "End: " & objAppointment.End
+            Debug.Print "Location: " & objAppointment.Location
+            Debug.Print String(60, "-") ' Just a separator
+        End If
+    Next
+End Sub
+
+
+Sub GetCalendarItemsForSpecificDay()
+    Dim objOutlook As Outlook.Application
+    Dim objNamespace As Outlook.Namespace
+    Dim objFolder As Outlook.Folder
+    Dim objItem As Object
+    Dim objAppointment As Outlook.AppointmentItem
+    Dim specificDayStart As Date
+    Dim specificDayEnd As Date
+    Dim filteredItems As Outlook.Items
+    Dim filter As String
+
+    ' Set the specific day for which you want to pull events
+    specificDayStart = DateSerial(Year(Now), Month(Now), Day(Now)) ' e.g., Today at 00:00
+    specificDayEnd = DateSerial(Year(Now), Month(Now), Day(Now) + 1) ' e.g., Tomorrow at 00:00
+
+    Set objOutlook = New Outlook.Application
+    Set objNamespace = objOutlook.GetNamespace("MAPI")
+
+    ' Assuming the Calendar is in your default mailbox, adjust if it's not
+    Set objFolder = objNamespace.GetDefaultFolder(olFolderCalendar)
+
+    ' Define a filter to get items within the specific day
+    filter = "[Start] >= '" & Format(specificDayStart, "mm/dd/yyyy hh:mm AMPM") & _
+             "' AND [End] <= '" & Format(specificDayEnd, "mm/dd/yyyy hh:mm AMPM") & "'"
+
+    Set filteredItems = objFolder.Items.Restrict(filter)
+    filteredItems.Sort "[Start]", True ' Sort by start time
+
+    For Each objItem In filteredItems
+        If TypeName(objItem) = "AppointmentItem" Then
+            Set objAppointment = objItem
+
+            ' Output appointment details to the Immediate Window (Ctrl+G in VBA editor)
+            Debug.Print "Subject: " & objAppointment.Subject
+            Debug.Print "Start: " & objAppointment.Start
+            Debug.Print "End: " & objAppointment.End
+            Debug.Print "Location: " & objAppointment.Location
+            Debug.Print String(60, "-") ' Just a separator
+        End If
+    Next
+End Sub
