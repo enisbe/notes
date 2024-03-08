@@ -1,6 +1,7 @@
 # Define the paths of your directories
 $dir1 = "\\BEC-NAS\cloud\Google Drive (enisbecirbegovic2022@u.northwestern.edu)\MSDS 458"
 $dir2 = "D:\HP Backup\Google Drive (enisbecirbegovic2022@u.northwestern.edu)\MSDS 401"
+$exclude_folder = "Path\To\Exclude\Folder" # Specify the folder path to exclude
 $extension = "*.*"
 
 # Function to check if the file path contains any segment starting with a '.'
@@ -11,9 +12,18 @@ function Test-IsHiddenFolder {
     return ($Path -split '\\' | Where-Object { $_ -match '^\.' }).Count -gt 0
 }
 
+# Function to check if the file path is under the excluded folder
+function Test-IsExcludedFolder {
+    param (
+        [string]$FilePath,
+        [string]$ExcludedFolderPath
+    )
+    return $FilePath.StartsWith($ExcludedFolderPath)
+}
+
 # Get all files from $dir1 recursively with their full paths
-# Exclude files that are in any subfolder starting with '.'
-$files1 = Get-ChildItem -Path $dir1 -Recurse -File -Filter $extension | Where-Object { -not (Test-IsHiddenFolder -Path $_.FullName) }
+# Exclude files that are in any subfolder starting with '.' or in the excluded folder
+$files1 = Get-ChildItem -Path $dir1 -Recurse -File -Filter $extension | Where-Object { -not (Test-IsHiddenFolder -Path $_.FullName) -and -not (Test-IsExcludedFolder -FilePath $_.FullName -ExcludedFolderPath $exclude_folder) }
 
 # Get all file names from $dir2 recursively
 $files2 = Get-ChildItem -Path $dir2 -Recurse -File -Filter $extension | Select-Object -ExpandProperty Name
