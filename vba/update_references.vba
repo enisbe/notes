@@ -31,7 +31,7 @@ Function ExtractWorkbookName(formula As String) As String
     ExtractWorkbookName = Mid(formula, start, finish - start + 1)
 End Function
 
-Function WorkbookIsOpen(name As String) As Boolean
+Function WorkbookIsOpen(ByVal name As String) As Boolean
     On Error Resume Next
     WorkbookIsOpen = Not (Workbooks(name) Is Nothing)
     On Error GoTo 0
@@ -91,7 +91,7 @@ Sub UpdateWorkbookReferences2()
         
         Debug.Print "Workbook Name: " & wbname
  
-        If Not WorkbookIsOpen(wbname) Then
+        If Not WorkbookIsOpen(wbnameNew) Then
             Set externalWb = Workbooks.Open(Filename:=fullPathNew, Password:="test")
             newFormula = Replace(cellFormula, replaceWhat, replaceWith)
             ws.Cells(i, "F").formula = newFormula
@@ -104,4 +104,58 @@ Sub UpdateWorkbookReferences2()
 
 ErrorHandler:
     MsgBox "Error: " & Err.Description & " (Line: " & Erl & ")"
+End Sub
+
+
+
+Sub UpdateFormulasNewFunction()
+    Dim selectedRange As Range
+    Dim row As Range
+    Dim cellFormula As String
+    Dim replaceWhat As String
+    Dim replaceWith As String
+    Dim fullPath As String
+    Dim actualRowNumber As Long
+    Set ws = ActiveSheet
+    '
+     Application.ScreenUpdating = False
+     
+     
+     replaceWhatCol = Range("C7").Value
+     replaceWithCol = Range("C8").Value
+     pass = Range("C9").Value
+     Range(Range("C6").Value).Select
+     
+     Set selectedRange = Selection
+
+    For Each row In selectedRange.Rows
+         
+        replaceWhat = ActiveSheet.Cells(row.row, replaceWhatCol).Value
+        replaceWith = ActiveSheet.Cells(row.row, replaceWithCol).Value
+        actualRowNumber = row.row
+
+         
+        firstCol = Split(row.Address, "$")(1)
+        cellFormula = ActiveSheet.Cells(row.row, firstCol).formula
+        fullPath = ExtractFullPath(cellFormula)
+        fullPathNew = Replace(fullPath, replaceWhat, replaceWith)
+        wbname = ExtractWorkbookName(cellFormula)
+        wbnameNew = Replace(wbname, replaceWhat, replaceWith)
+
+
+         If Not WorkbookIsOpen(wbnameNew) Then
+           Set externalWbNew = Workbooks.Open(Filename:=fullPathNew, Password:=pass)
+           ws.Activate
+           row.Select
+           Selection.Replace What:=replaceWhat, Replacement:=replaceWith, LookAt:=xlPart, _
+           SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
+           ReplaceFormat:=False, FormulaVersion:=xlReplaceFormula2
+            
+          externalWbNew.Close SaveChanges:=False
+        End If
+     
+    Next row
+    Application.ScreenUpdating = True
+    
+    Range("A1").Select
 End Sub
