@@ -1,3 +1,5 @@
+ 
+
 Function ExtractDatePattern(workbookName As String, partbefore As String, partafter As String) As String
     
 
