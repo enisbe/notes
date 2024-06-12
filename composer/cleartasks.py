@@ -4,6 +4,7 @@ from airflow.utils.dates import days_ago
 from airflow.models import TaskInstance
 from airflow import settings
 from datetime import datetime, timedelta
+import pytz
 
 def clear_task_instances_func(dag_id: str, start_date: datetime, end_date: datetime = None):
     session = settings.Session()
@@ -24,6 +25,9 @@ def clear_task_instances_func(dag_id: str, start_date: datetime, end_date: datet
         ti.state = None
     session.commit()
     session.close()
+
+# Define the timezone
+eastern = pytz.timezone("US/Eastern")
 
 # Define the DAG
 default_args = {
@@ -49,9 +53,9 @@ with DAG(
         task_id='clear_task_instances_task',
         python_callable=clear_task_instances_func,
         op_kwargs={
-            'dag_id': 'daily_8am_et_reset',
-            'start_date': datetime(2024, 6, 10),
-            'end_date': datetime(2024, 6, 12)  # You can adjust the end date as needed
+            'dag_id': 'DEPOSITS_RUNNER_NEW',
+            'start_date': eastern.localize(datetime(2024, 6, 10, 0, 0, 0)),
+            'end_date': eastern.localize(datetime(2024, 6, 12, 0, 0, 0))  # You can adjust the end date as needed
         },
     )
 
