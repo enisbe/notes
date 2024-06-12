@@ -1,31 +1,43 @@
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
-from airflow.api.common.experimental.mark_tasks import clear_task_instances
 from airflow.models import TaskInstance
 from airflow import settings
+from datetime import datetime, timedelta
 
-# Function to clear task instances
-def clear_task_instances_func():
-    dag_id = 'daily_8am_et_reset'
+def clear_task_instances_func(dag_id: str, start_date: datetime, end_date: datetime = None):
     session = settings.Session()
+    
+    # Query for the task instances within the date range
+    query = session.query(TaskInstance).filter(
+        TaskInstance.dag_id == dag_id,
+        TaskInstance.execution_date >= start_date
+    )
+    
+    if end_date:
+        query = query.filter(TaskInstance.execution_date <= end_date)
+    
+    tis = query.all()
 
-    # Clear all task instances for this DAG
-    tis = session.query(TaskInstance).filter(TaskInstance.dag_id == dag_id).all()
-    clear_task_instances(tis, session)
+    # Set the state of the task instances to None (cleared)
+    for ti in tis:
+        ti.state = None
     session.commit()
+    session.close()
 
 # Define the DAG
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5),
+}
+
 with DAG(
     'clear_task_instances_dag',
-    default_args={
-        'owner': 'airflow',
-        'depends_on_past': False,
-        'email_on_failure': False,
-        'email_on_retry': False,
-        'retries': 1,
-        'retry_delay': timedelta(minutes=5),
-    },
+    default_args=default_args,
     description='A DAG to clear task instances',
     schedule_interval=None,  # Manual trigger only
     start_date=days_ago(1),
@@ -36,6 +48,11 @@ with DAG(
     clear_task = PythonOperator(
         task_id='clear_task_instances_task',
         python_callable=clear_task_instances_func,
+        op_kwargs={
+            'dag_id': 'daily_8am_et_reset',
+            'start_date': datetime(2024, 6, 10),
+            'end_date': datetime(2024, 6, 12)  # You can adjust the end date as needed
+        },
     )
 
     clear_task
