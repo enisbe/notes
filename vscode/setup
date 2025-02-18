@@ -22,6 +22,12 @@
             "when": "editorTextFocus && isWorkspaceTrusted && jupyter.ownsSelection && !findInputFocussed && !jupyter.webExtension && !notebookEditorFocused && !replaceInputFocussed && editorLangId == 'python'"
         },
 
+     {
+            "key": "ctrl+enter",
+            "command": "interactive.execute",
+            "when": "isCompositeNotebook && activeEditor == 'workbench.editor.interactive'"
+        }
+
         // {
         //     "key": "shift+enter",
         //     "command": "extension.multiCommand.execute",
