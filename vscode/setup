@@ -1,0 +1,57 @@
+
+# keybindings.json
+
+// Place your key bindings in this file to override the defaultsauto[]
+[
+    // {
+    //     "key": "shift+enter",
+    //     "command": "jupyter.execSelectionInteractive",
+    //     "when": "editorTextFocus && isWorkspaceTrusted && jupyter.ownsSelection && !findInputFocussed && !jupyter.webExtension && !notebookEditorFocused && !replaceInputFocussed && editorLangId == 'python'"
+    // },
+    // {
+    //     "key": "shift+enter",
+    //     "command": "-jupyter.execSelectionInteractive",
+    //     "when": "editorTextFocus && isWorkspaceTrusted && jupyter.ownsSelection && !findInputFocussed && !jupyter.webExtension && !notebookEditorFocused && !replaceInputFocussed && editorLangId == 'python'"
+    // }
+
+    
+        {
+            "key": "shift+enter",
+            "command": "extension.multiCommand.execute",
+            "args": { "command": "multiCommand.sendAndMoveNext" },
+            "when": "editorTextFocus && isWorkspaceTrusted && jupyter.ownsSelection && !findInputFocussed && !jupyter.webExtension && !notebookEditorFocused && !replaceInputFocussed && editorLangId == 'python'"
+        },
+
+        // {
+        //     "key": "shift+enter",
+        //     "command": "extension.multiCommand.execute",
+        //     "args": { "command": "multiCommand.sendAndMoveNextSimple" },
+        //     "when": "editorTextFocus"
+        //   }
+
+
+ 
+        
+     
+]
+
+# settings.json
+
+
+
+    "multiCommand.commands": [
+      {
+          "command": "multiCommand.sendAndMoveNext",
+          "sequence": [
+              "jupyter.execSelectionInteractive",
+              "cursorDown"
+          ]
+      },
+      // This command is only used for test
+      {
+          "command": "multiCommand.sendAndMoveNextSimple",
+          "sequence": [
+              "editor.action.insertLineAfter"
+          ]
+      }
+],
