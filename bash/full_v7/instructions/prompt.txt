@@ -1,0 +1,12 @@
+
+The objective is the create rating record form to populate data. The form must work with form database models and FAST API.  Use @instructions_rating_records.md as instructions and guidline how to create the form. 
+
+Currently we are working in currently 
+
+
+Step 1:
+
+ Familiarize yourself with views in the full_v6 web application. In the ORR view, below the existing section, add a Risk Rating view section.
+
+ Look at the FastAPI endpoints and schemas to add a table that will display existing Risk Records for the selected obligor/borrower. 
+ Note that risk_rdting record table has also obligor profile.  Make sure that we display of 

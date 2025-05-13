@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk Dashboard</title>
+    <!-- Vuetify CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.5.1/dist/vuetify.min.css" rel="stylesheet">
+    <!-- Material Design Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+    <style>
+        body { font-family: sans-serif; margin: 0; background-color: #f5f5f5; }
+        #app { padding-top: 20px; }
+        .v-main {
+            background-color: #f5f5f5; /* Light gray background for main content area */
+        }
+        .v-card {
+            background-color: white; /* Ensure cards are white */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow for better contrast */
+        }
+        .clickable-row { cursor: pointer; }
+        .clickable-row:hover { background-color: rgba(0, 0, 0, 0.04); }
+        .section-title { margin-bottom: 16px; font-weight: 500; }
+        .detail-card { margin-top: 20px; }
+        .sticky-header { position: sticky; top: 0; z-index: 10; background-color: white; }
+        .selected-row { background-color: rgba(25, 118, 210, 0.08) !important; }
+        .facility-sub-list {
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            margin: 8px;
+        }
+        .facility-sub-item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            margin-bottom: 4px;
+        }
+        .facility-sub-item:last-child {
+            border-bottom: none;
+        }
+        .facility-detail {
+            padding: 4px 8px;
+        }
+        .facility-detail .font-weight-medium {
+            color: rgba(0, 0, 0, 0.6);
+            margin-right: 8px;
+        }
+        .selected-row {
+            background-color: #e3f2fd !important;
+        }
+        .clickable-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .clickable-row:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* Obligor row styles */
+        .obligor-main-row {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        }
+        
+        .obligor-main-row.selected-row {
+            background-color: #e3f2fd !important;
+        }
+        
+        .obligor-main-row:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .obligor-main-row td {
+            padding: 12px 16px;
+        }
+        
+        .primary--text {
+            color: #1976D2 !important;
+        }
+        
+        /* Facility container styles */
+        .facilities-container {
+            background-color: #fafafa;
+            border-radius: 0 0 4px 4px;
+        }
+        
+        /* Facility table styles */
+        .facilities-table {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Empty state styles */
+        .text-grey {
+            color: rgba(0, 0, 0, 0.6);
+        }
+        
+        .facilities-table thead {
+            background-color: #f5f5f5;
+        }
+        
+        .facilities-table thead th {
+            font-size: 0.82rem;
+            color: rgba(0, 0, 0, 0.7);
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+        
+        .facility-row td {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        
+        .facility-row:last-child td {
+            border-bottom: none;
+        }
+        
+        .facility-row.selected-row {
+            background-color: #e3f2fd !important;
+        }
+        
+        .facility-row:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Facility row styles */
+        .facility-row {
+            background-color: #e3f2fd !important; /* Light blue for all facility rows */
+            transition: background-color 0.2s;
+        }
+        
+        /* Selected facility rows get a darker blue */
+        .facility-row.selected-row {
+            background-color: #bbdefb !important; /* Darker blue when selected */
+        }
+        
+        .facility-row:hover {
+            background-color: #c8e6ff !important; /* Slightly darker when hovering */
+        }
+        
+        .no-pagination .v-data-table__footer, 
+        .no-pagination .v-data-table-footer,
+        .no-pagination tfoot {
+            display: none !important;
+        }
+        
+        /* Make table headers bold */
+        .v-data-table thead th {
+            font-weight: bold !important;
+        }
+        
+        /* Make tables more compact */
+        .v-data-table.compact-table {
+            font-size: 0.875rem !important;
+        }
+        
+        .v-data-table.compact-table td,
+        .v-data-table.compact-table th {
+            padding: 4px 8px !important;
+        }
+        
+        .v-data-table.compact-table tr {
+            min-height: 32px !important;
+            height: 32px !important;
+        }
+        
+        /* Alert style - make more compact */
+        .compact-alert {
+            padding: 8px !important;
+        }
+
+        /* Navigation tabs */
+        .v-tab.v-tab--selected {
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+
+        /* Router view transition */
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.3s;
+        }
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+        }
+        
+        /* Expand/collapse buttons */
+        .expand-collapse-buttons {
+            display: inline-flex;
+            margin-left: 12px;
+        }
+        
+        .expand-collapse-buttons .v-btn {
+            min-width: 36px;
+            height: 24px;
+            margin-right: 4px;
+        }
+        
+        /* Higher contrast expand/collapse buttons */
+        .expand-collapse-buttons .v-btn {
+            background-color: #1976D2 !important;
+            color: white !important;
+            border-radius: 4px !important;
+            font-weight: bold !important;
+            padding: 0 12px !important;
+            min-width: 42px !important;
+        }
+        
+        /* Add square brackets to icons */
+        .expand-collapse-buttons .v-btn .v-icon:before {
+           
+            margin-right: 3px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .expand-collapse-buttons .v-btn .v-icon:after {
+       
+            margin-left: 3px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+    </style>
+    
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.1/dist/vuetify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-router@4.2.4/dist/vue-router.global.js"></script>
+</head>
+<body>
+    <div id="app">
+        <v-app>
+            <v-app-bar color="primary" density="compact">
+                <v-app-bar-title class="text-white">Credit Risk Dashboard</v-app-bar-title>
+                <v-tabs 
+                    v-model="currentTab" 
+                    color="white" 
+                    align-tabs="center"
+                >
+                    <v-tab value="summary" to="/">Summary</v-tab>
+                    <v-tab value="orr" to="/orr">ORR View</v-tab>
+                    <v-tab value="lrr" to="/lrr">LRR View</v-tab>
+                </v-tabs>
+            </v-app-bar>
+
+            <v-main>
+                <v-container fluid>
+                    <router-view v-slot="{ Component }">
+                        <transition name="fade" mode="out-in">
+                            <component :is="Component" />
+                        </transition>
+                    </router-view>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <!-- Template for Summary View Component -->
+    <script type="text/x-template" id="summary-template">
+        <div>
+            <v-card class="mb-4">
+                <v-card-title class="sticky-header">
+                    <h2 class="section-title d-flex align-center justify-space-between w-100">
+                        <span class="d-flex align-center">
+                            <v-icon start>mdi-finance</v-icon>
+                            Summary Dashboard
+                        </span>
+                        <v-btn 
+                            color="primary" 
+                            prepend-icon="mdi-magnify" 
+                            @click="showObligorSearchModal = true"
+                            class="text-none"
+                        >
+                            Search Obligors
+                        </v-btn>
+                    </h2>
+                </v-card-title>
+            </v-card>
+
+            <!-- Search Obligors Modal Dialog -->
+            <v-dialog v-model="showObligorSearchModal" max-width="1000" scrollable persistent>
+                <v-card style="height: 700px; display: flex; flex-direction: column;">
+                    <v-card-title class="sticky-header">
+                        <h2 class="section-title d-flex align-center">
+                            <v-icon start>mdi-finance</v-icon>
+                            Search Obligors
+                        </h2>
+                        <v-spacer></v-spacer>
+                        <v-btn icon="mdi-close" @click="showObligorSearchModal = false"></v-btn>
+                    </v-card-title>
+                    <v-card-text style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+                        <v-text-field
+                            v-model="combinedSearch"
+                            label="Search Obligors"
+                            prepend-inner-icon="mdi-magnify"
+                            variant="solo-filled"
+                            flat
+                            density="compact"
+                            hide-details
+                            clearable
+                            class="mb-4"
+                        ></v-text-field>
+                        
+                        <div style="flex-grow: 1; overflow: auto;">
+                            <v-data-table-server
+                                v-model:expanded="expandedGroups"
+                                :headers="combinedHeaders"
+                                :items="processedItems"
+                                density="compact"
+                                :items-length="totalProcessedItems"
+                                :loading="combinedLoading"
+                                :items-per-page="10"
+                                class="elevation-2"
+                                item-value="id"
+                                @update:options="loadCombinedData"
+                                hover
+                                height="400px"
+                                fixed-header
+                            >
+                                <template v-slot:item="{ item, internalItem, columns }">
+                                    <tr 
+                                        v-if="internalItem.raw.type === 'obligor'" 
+                                        class="obligor-main-row clickable-row" 
+                                        @click="handleObligorRowClick(internalItem.raw.data, internalItem); showObligorSearchModal = false;"
+                                        :class="{ 'selected-row': selectedObligorId === internalItem.raw.data.obligor_id }"
+                                    >
+                                        <td class="font-weight-medium">{{ internalItem.raw.data.obligor_id }}</td>
+                                        <td class="font-weight-medium primary--text">{{ internalItem.raw.data.name }}</td>
+                                        <td>{{ internalItem.raw.data.address }}</td>
+                                    </tr>
+                                </template>
+                            </v-data-table-server>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+
+            <!-- Obligor Data Section -->
+            <div v-if="selectedObligor" class="mt-4">
+                <v-card class="mb-4">
+                    <v-card-title class="text-primary">Obligor Details: {{ selectedObligor.name }}</v-card-title>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" sm="6">
+                                <p><strong>Obligor ID:</strong> {{ selectedObligor.obligor_id }}</p>
+                                <p><strong>Address:</strong> {{ selectedObligor.address }}</p>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+
+                <!-- Obligor Profiles -->
+                <v-card class="mb-4">
+                    <v-card-title>
+                        <h3 class="text-h6">Obligor Profiles</h3>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-data-table
+                            :headers="[
+                                { title: 'Profile ID', key: 'obligor_profile_id' },
+                                { title: 'As of Date', key: 'as_of_date' },
+                                { title: 'Commitment', key: 'commitment' },
+                                { title: 'Moody Rating', key: 'moody_rating' }
+                            ]"
+                            :items="selectedObligorProfiles"
+                            :loading="selectedObligorProfilesLoading"
+                            class="elevation-1"
+                            density="compact"
+                        ></v-data-table>
+                    </v-card-text>
+                </v-card>
+
+                <!-- Facilities -->
+                <v-card>
+                    <v-card-title class="d-flex align-center">
+                        <h3 class="text-h6">Facilities</h3>
+                        <div class="expand-collapse-buttons">
+                            <v-btn
+                                size="small"
+                                color="primary"
+                                variant="elevated"
+                                density="compact"
+                                @click="expandAllFacilities"
+                                :disabled="selectedObligor.facilities && selectedObligor.facilities.length === 0"
+                                title="Expand All"
+                            >
+                                <v-icon size="small">mdi-plus</v-icon>
+                            </v-btn>
+                            <v-btn
+                                size="small"
+                                color="primary"
+                                variant="elevated"
+                                density="compact"
+                                @click="collapseAllFacilities"
+                                :disabled="!expandedRows || expandedRows.length === 0"
+                                title="Collapse All"
+                            >
+                                <v-icon size="small">mdi-minus</v-icon>
+                            </v-btn>
+                        </div>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-data-table
+                            :headers="[
+                                { title: 'Facility ID', key: 'facility_id' },
+                                { title: 'Name', key: 'name' },
+                                { title: 'Property Type', key: 'property_type' },
+                                { title: 'Address', key: 'address' }
+                            ]"
+                            :items="selectedObligor.facilities || []"
+                            class="elevation-1"
+                            density="compact"
+                            :expanded="expandedRows"
+                            expand-on-click
+                            item-value="facility_id"
+                            @update:expanded="updatedExpandedRows"
+                        >
+                            <template v-slot:expanded-row="{ columns, item }">
+                                <tr>
+                                    <td :colspan="columns.length">
+                                        <div class="pa-4 bg-grey-lighten-4">
+                                            <h4 class="text-subtitle-1 mb-2">Facility Profiles</h4>
+                                            <div v-if="!facilityProfiles[item.facility_id]" class="text-center pa-4">
+                                                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                                            </div>
+                                            <v-data-table
+                                                v-else
+                                                :headers="[
+                                                    { title: 'Profile ID', key: 'facility_profile_id' },
+                                                    { title: 'As of Date', key: 'as_of_date' },
+                                                    { title: 'Loan Amount', key: 'loan_amount' },
+                                                    { title: 'Collateral Amount', key: 'collateral_amount' },
+                                                    { title: 'LTV', key: 'ltv' }
+                                                ]"
+                                                :items="facilityProfiles[item.facility_id] || []"
+                                                density="compact"
+                                                class="elevation-0"
+                                            ></v-data-table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </v-data-table>
+                    </v-card-text>
+                </v-card>
+            </div>
+        </div>
+    </script>
+
+    <!-- Template for ORR View Component -->
+    <script type="text/x-template" id="orr-template">
+        <div>
+            <v-card class="mb-4">
+                <v-card-title class="sticky-header">
+                    <h2 class="section-title d-flex align-center justify-space-between w-100">
+                        <span class="d-flex align-center">
+                            <v-icon start>mdi-chart-bar</v-icon>
+                            Obligor Risk Rating (ORR) View
+                        </span>
+                        <v-btn 
+                            color="primary" 
+                            prepend-icon="mdi-magnify" 
+                            @click="showObligorSearchModal = true"
+                            class="text-none"
+                        >
+                            Search Obligors
+                        </v-btn>
+                    </h2>
+                </v-card-title>
+            </v-card>
+
+            <!-- Search Obligors Modal Dialog (similar to Summary View) -->
+            <v-dialog v-model="showObligorSearchModal" max-width="1000" scrollable persistent>
+                <v-card style="height: 700px; display: flex; flex-direction: column;">
+                    <v-card-title class="sticky-header">
+                        <h2 class="section-title d-flex align-center">
+                            <v-icon start>mdi-finance</v-icon>
+                            Search Obligors
+                        </h2>
+                        <v-spacer></v-spacer>
+                        <v-btn icon="mdi-close" @click="showObligorSearchModal = false"></v-btn>
+                    </v-card-title>
+                    <v-card-text style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+                        <v-text-field
+                            v-model="combinedSearch"
+                            label="Search Obligors"
+                            prepend-inner-icon="mdi-magnify"
+                            variant="solo-filled"
+                            flat
+                            density="compact"
+                            hide-details
+                            clearable
+                            class="mb-4"
+                        ></v-text-field>
+                        
+                        <div style="flex-grow: 1; overflow: auto;">
+                            <v-data-table-server
+                                :headers="combinedHeaders"
+                                :items="processedItems"
+                                density="compact"
+                                :items-length="totalProcessedItems"
+                                :loading="combinedLoading"
+                                :items-per-page="10"
+                                class="elevation-2"
+                                item-value="id"
+                                @update:options="loadCombinedData"
+                                hover
+                                height="400px"
+                                fixed-header
+                            >
+                                <template v-slot:item="{ item, internalItem, columns }">
+                                    <tr 
+                                        class="obligor-main-row clickable-row" 
+                                        @click="handleObligorRowClick(internalItem.raw.data, internalItem); showObligorSearchModal = false;"
+                                        :class="{ 'selected-row': selectedObligorId === internalItem.raw.data.obligor_id }"
+                                    >
+                                        <td class="font-weight-medium">{{ internalItem.raw.data.obligor_id }}</td>
+                                        <td class="font-weight-medium primary--text">{{ internalItem.raw.data.name }}</td>
+                                        <td>{{ internalItem.raw.data.address }}</td>
+                                    </tr>
+                                </template>
+                            </v-data-table-server>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+
+            <!-- Selected Obligor Details -->
+            <div v-if="selectedObligor" class="mt-4">
+                <v-card class="mb-4">
+                    <v-card-title class="text-primary">Obligor Details: {{ selectedObligor.name }}</v-card-title>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" sm="6">
+                                <p><strong>Obligor ID:</strong> {{ selectedObligor.obligor_id }}</p>
+                                <p><strong>Address:</strong> {{ selectedObligor.address }}</p>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+
+                <!-- ORR-specific Facilities Section -->
+                <v-card>
+                    <v-card-title class="d-flex align-center">
+                        <h3 class="text-h6">Associated Facilities</h3>
+                        <div class="expand-collapse-buttons">
+                            <v-btn
+                                size="small"
+                                color="primary"
+                                variant="elevated"
+                                density="compact"
+                                @click="expandAllFacilities"
+                                :disabled="selectedObligor.facilities && selectedObligor.facilities.length === 0"
+                                title="Expand All"
+                            >
+                                <v-icon size="small">mdi-plus</v-icon>
+                            </v-btn>
+                            <v-btn
+                                size="small"
+                                color="primary"
+                                variant="elevated"
+                                density="compact"
+                                @click="collapseAllFacilities"
+                                :disabled="!expandedRows || expandedRows.length === 0"
+                                title="Collapse All"
+                            >
+                                <v-icon size="small">mdi-minus</v-icon>
+                            </v-btn>
+                        </div>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-data-table
+                            :headers="[
+                                { title: 'Facility ID', key: 'facility_id' },
+                                { title: 'Name', key: 'name' },
+                                { title: 'Property Type', key: 'property_type' },
+                                { title: 'ORR Rating', key: 'orr_rating', align: 'end' },
+                            ]"
+                            :items="selectedObligor.facilities || []"
+                            class="elevation-1"
+                            density="compact"
+                            :expanded="expandedRows"
+                            expand-on-click
+                            item-value="facility_id"
+                            @update:expanded="updatedExpandedRows"
+                        >
+                            <template v-slot:expanded-row="{ columns, item }">
+                                <tr>
+                                    <td :colspan="columns.length">
+                                        <div class="pa-4 bg-grey-lighten-4">
+                                            <h4 class="text-subtitle-1 mb-2">Facility Profiles</h4>
+                                            <div v-if="!facilityProfiles[item.facility_id]" class="text-center pa-4">
+                                                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                                            </div>
+                                            <v-data-table
+                                                v-else
+                                                :headers="[
+                                                    { title: 'Profile ID', key: 'facility_profile_id' },
+                                                    { title: 'As of Date', key: 'as_of_date' },
+                                                    { title: 'Loan Amount', key: 'loan_amount' },
+                                                    { title: 'Collateral Amount', key: 'collateral_amount' },
+                                                    { title: 'LTV', key: 'ltv' }
+                                                ]"
+                                                :items="facilityProfiles[item.facility_id] || []"
+                                                density="compact"
+                                                class="elevation-0"
+                                            ></v-data-table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </v-data-table>
+                    </v-card-text>
+                </v-card>
+            </div>
+        </div>
+    </script>
+
+    <!-- Template for LRR View Component -->
+    <script type="text/x-template" id="lrr-template">
+        <div>
+            <v-card class="mb-4">
+                <v-card-title class="sticky-header">
+                    <h2 class="section-title d-flex align-center justify-space-between w-100">
+                        <span class="d-flex align-center">
+                            <v-icon start>mdi-currency-usd</v-icon>
+                            Loss Risk Rating (LRR) View
+                        </span>
+                        <v-btn 
+                            color="primary" 
+                            prepend-icon="mdi-magnify" 
+                            @click="showObligorSearchModal = true"
+                            class="text-none"
+                        >
+                            Search Obligors
+                        </v-btn>
+                    </h2>
+                </v-card-title>
+            </v-card>
+
+            <!-- Search Obligors Modal Dialog (similar to other views) -->
+            <v-dialog v-model="showObligorSearchModal" max-width="1000" scrollable persistent>
+                <v-card style="height: 700px; display: flex; flex-direction: column;">
+                    <v-card-title class="sticky-header">
+                        <h2 class="section-title d-flex align-center">
+                            <v-icon start>mdi-finance</v-icon>
+                            Search Obligors
+                        </h2>
+                        <v-spacer></v-spacer>
+                        <v-btn icon="mdi-close" @click="showObligorSearchModal = false"></v-btn>
+                    </v-card-title>
+                    <v-card-text style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+                        <v-text-field
+                            v-model="combinedSearch"
+                            label="Search Obligors"
+                            prepend-inner-icon="mdi-magnify"
+                            variant="solo-filled"
+                            flat
+                            density="compact"
+                            hide-details
+                            clearable
+                            class="mb-4"
+                        ></v-text-field>
+                        
+                        <div style="flex-grow: 1; overflow: auto;">
+                            <v-data-table-server
+                                :headers="combinedHeaders"
+                                :items="processedItems"
+                                density="compact"
+                                :items-length="totalProcessedItems"
+                                :loading="combinedLoading"
+                                :items-per-page="10"
+                                class="elevation-2"
+                                item-value="id"
+                                @update:options="loadCombinedData"
+                                hover
+                                height="400px"
+                                fixed-header
+                            >
+                                <template v-slot:item="{ item, internalItem, columns }">
+                                    <tr 
+                                        class="obligor-main-row clickable-row" 
+                                        @click="handleObligorRowClick(internalItem.raw.data, internalItem); showObligorSearchModal = false;"
+                                        :class="{ 'selected-row': selectedObligorId === internalItem.raw.data.obligor_id }"
+                                    >
+                                        <td class="font-weight-medium">{{ internalItem.raw.data.obligor_id }}</td>
+                                        <td class="font-weight-medium primary--text">{{ internalItem.raw.data.name }}</td>
+                                        <td>{{ internalItem.raw.data.address }}</td>
+                                    </tr>
+                                </template>
+                            </v-data-table-server>
+                        </div>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+
+            <!-- Selected Obligor Details -->
+            <div v-if="selectedObligor" class="mt-4">
+                <v-card class="mb-4">
+                    <v-card-title class="text-primary">Obligor Details: {{ selectedObligor.name }}</v-card-title>
+                    <v-card-text>
+                        <v-row>
+                            <v-col cols="12" sm="6">
+                                <p><strong>Obligor ID:</strong> {{ selectedObligor.obligor_id }}</p>
+                                <p><strong>Address:</strong> {{ selectedObligor.address }}</p>
+                            </v-col>
+                        </v-row>
+                    </v-card-text>
+                </v-card>
+
+                <!-- LRR-specific Obligor Profiles Section -->
+                <v-card>
+                    <v-card-title>
+                        <h3 class="text-h6">Obligor Profiles & LRR Ratings</h3>
+                    </v-card-title>
+                    <v-card-text>
+                        <v-data-table
+                            :headers="[
+                                { title: 'Profile ID', key: 'obligor_profile_id' },
+                                { title: 'As of Date', key: 'as_of_date' },
+                                { title: 'Commitment', key: 'commitment' },
+                                { title: 'Moody Rating', key: 'moody_rating' },
+                                { title: 'LRR Rating', key: 'lrr_rating' },
+                                { title: 'Probability of Default', key: 'pd', align: 'end' }
+                            ]"
+                            :items="selectedObligorProfiles"
+                            :loading="selectedObligorProfilesLoading"
+                            class="elevation-1"
+                            density="compact"
+                        ></v-data-table>
+                    </v-card-text>
+                </v-card>
+            </div>
+        </div>
+    </script>
+
+    <!-- Main JS file -->
+    <script src="/static/main_full.js"></script>
+</body>
+</html> 
