@@ -36,7 +36,7 @@ def populate_base_data(db: Session, num_obligors: int):
         obligor_data = schemas.ObligorCreate(
             name=fake.company(),
             address=fake.address(),
-            src_arg_num=fake.bothify(text=f"ARG-{'%%#####' if i < 100000 else '%%####'}") # Ensure unique enough
+            src_arng_num=fake.bothify(text=f"ARG-{'%%#####' if i < 100000 else '%%####'}") # Ensure unique enough
         )
         obligor = crud.create_obligor(db=db, obligor=obligor_data)
         obligors_db.append(obligor)
@@ -85,9 +85,11 @@ def populate_base_data(db: Session, num_obligors: int):
         for _ in range(NUM_PROFILES_PER_OBLIGOR):
             profile_data = schemas.ObligorProfileCreate(
                 obligor_id=obligor.obligor_id,
+                as_of_date=fake.date_between(start_date='-2y', end_date='today'),
                 credit_officer=fake.name(),
                 comment=fake.text(max_nb_chars=200)
             )
+  
             profile = crud.create_obligor_profile(db=db, profile=profile_data)
             obligor_profiles_db.append(profile)
     print(f"- Created {len(obligor_profiles_db)} obligor profiles.")
@@ -131,8 +133,8 @@ def populate_base_data(db: Session, num_obligors: int):
                 net_operating_income=float(net_operating_income),
                 appraisal_value=float(appraisal_value),
                 cap_rate=float(cap_rate),
-                ltv=float(ltv),
-                workout_cost=float(workout_cost)
+                ltv=float(ltv)
+ 
             )
             profile = crud.create_facility_profile(db=db, profile=profile_data)
             facility_profiles_db.append(profile)

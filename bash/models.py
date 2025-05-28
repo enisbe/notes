@@ -20,7 +20,7 @@ class Obligor(Base):
     
     obligor_id = Column(Integer, primary_key=True, index=True)
     
-    src_arg_num = Column(String(100), nullable=True)
+    src_arng_num = Column(String(100), nullable=True)
     name = Column(String)
     created = Column(DateTime, nullable=False, server_default=func.now())
     modified = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
@@ -36,6 +36,7 @@ class ObligorProfile(Base):
     
     obligor_profile_id = Column(Integer, primary_key=True, index=True)
     obligor_id = Column(Integer, ForeignKey('obligor.obligor_id', ondelete="CASCADE"), nullable=True)
+    as_of_date = Column(Date, nullable=True)
     credit_officer = Column(String(500), nullable=True)
     comment = Column(String(5000), nullable=True)
 
@@ -53,6 +54,7 @@ class Facility(Base):
     description = Column(String)
     name = Column(String)
     src_facility_num = Column(String(100), nullable=True)
+    
     address = Column(String)
     property_type = Column(String(100), nullable=True) # consilder changing to facility type or enum to standardize
     insert_datetime = Column(DateTime, nullable=True, server_default=func.now())
@@ -83,7 +85,7 @@ class FacilityProfile(Base):
     appraisal_value = Column(DECIMAL(18, 5), nullable=True)
     cap_rate = Column(DECIMAL(18, 5), nullable=True)
     ltv = Column(DECIMAL(18, 5), nullable=True)
-    workout_cost = Column(DECIMAL(18, 5), nullable=True)
+ 
     
     insert_datetime = Column(DateTime, nullable=True, server_default=func.now())
     update_datetime = Column(DateTime, nullable=True, server_default=func.now(), onupdate=func.now())
