@@ -80,8 +80,26 @@ git_checkout_remote_as() {
     git checkout -b "$1" "origin/$2"
 }
 
+# Fetches from origin and then checks out the specified branch.
+# This function combines git_fetch_origin and git_checkout_remote.
+#
+# Usage:
+#   git_fetch_and_checkout <branch-name>
+#
+git_fetch_and_checkout() {
+    if [ -z "$1" ]; then
+        echo "Error: Branch name not provided."
+        echo "Usage: git_fetch_and_checkout <branch-name>"
+        return 1
+    fi
+    echo "Fetching from origin and checking out branch '$1'..."
+    git_fetch_origin
+    git_checkout_remote "$1"
+}
+
 echo "Git helper functions loaded. You can now use:"
 echo "  - git_fetch_origin"
 echo "  - git_checkout_remote <branch-name>"
 echo "  - git_switch_to_branch <branch-name>"
-echo "  - git_checkout_remote_as <local-name> <remote-name>" 
+echo "  - git_checkout_remote_as <local-name> <remote-name>"
+echo "  - git_fetch_and_checkout <branch-name>" 
