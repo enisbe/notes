@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# ==============================================================================
+# Script: Replace Jupyter with a Flask Web Server on a Vertex AI Notebook
+# Description: This script stops the default JupyterLab service, installs Flask,
+#              creates a simple web application, and runs it on the public
+#              port 8080. It also includes commands to check the status of
+#              the Jupyter service and the proxy container.
+# Usage: Run this script directly from the terminal of your Vertex AI instance.
+# ==============================================================================
+
+
+# --- (Optional) Diagnostic Step A: Check Jupyter Service Status ---
+# Before making changes, you can see the status of the default Jupyter service.
+# It should show "active (running)".
+
+echo "--> Checking current status of jupyter.service..."
+sudo systemctl status jupyter.service
+echo "--> Press Q to exit the status view."
+sleep 3 # Give user time to read
+echo ""
+
+
+# --- (Optional) Diagnostic Step B: Check the Inverting Proxy Docker Container ---
+# The proxy forwards requests to your services. You can inspect it with Docker.
+
+echo "--> Listing active Docker containers to find the proxy..."
+sudo docker ps
+echo ""
+echo "--> Inspecting the 'inverting-proxy' container for details..."
+# Note: The container name might vary, but 'inverting-proxy' is common.
+sudo docker inspect inverting-proxy
+echo ""
+echo "--> Diagnostic checks complete."
+sleep 3 # Give user time to read
+echo ""
+
+
+# --- Step 1: Stop and Disable the Systemd Jupyter Service ---
+# The JupyterLab interface on Vertex AI runs as a systemd service. To free up
+# port 8080, we first need to stop the currently running service. Disabling it
+# prevents it from automatically restarting upon a machine reboot.
+
+echo "--> Stopping and disabling the default Jupyter service..."
+sudo systemctl stop jupyter.service
+sudo systemctl disable jupyter.service
+echo "--> Jupyter service has been stopped and disabled."
+echo ""
+
+
+# --- Step 2: Install Flask ---
+# We use pip, the Python package installer, to install the Flask framework.
+# The --quiet flag reduces the amount of installation log output.
+
+echo "--> Installing Flask using pip..."
+pip install Flask --quiet
+echo "--> Flask has been installed."
+echo ""
+
+
+# --- Step 3: Create the Flask Application File (app.py) ---
+# Here, we use a 'here document' (cat << 'EOF' ... EOF) to create a new file
+# named `app.py` and populate it with a basic "Hello World" Flask application.
+# This avoids the need to manually open a text editor like nano or vim.
+# The `app.run` command is configured to listen on '0.0.0.0', which is
+# essential for the server to be accessible from outside the VM.
+
+echo "--> Creating the Python script for the Flask app (app.py)..."
+cat << 'EOF' > app.py
+# Import the Flask class from the flask package
+from flask import Flask
+
+# Create an instance of the Flask class
+app = Flask(__name__)
+
+# Define a route for the root URL ('/')
+@app.route('/')
+def hello_world():
+    """This function runs when someone visits the root URL."""
+    # The HTML content to be returned to the browser
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Flask on Vertex AI</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+            .container { text-align: center; padding: 40px; background-color: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+            h1 { color: #333; }
+            p { color: #555; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>My Flask App is Running!</h1>
+            <p>The Jupyter service has been replaced on this Vertex AI instance.</p>
+        </div>
+    </body>
+    </html>
+    """
+    return html_content
+
+# This block ensures the server only runs when the script is executed directly
+if __name__ == '__main__':
+    # Run the app, listening on all available network interfaces (0.0.0.0)
+    # on the standard web proxy port (8080).
+    app.run(host='0.0.0.0', port=8080)
+EOF
+echo "--> app.py has been created successfully."
+echo ""
+
+
+# --- Step 4: Run the Flask Application ---
+# This command executes the Python script. The Flask development server will
+# start and take control of the terminal, continuously listening for incoming
+# web requests. To stop the server, you can press CTRL+C in the terminal.
+
+echo "--> Starting the Flask server..."
+echo "--> Your app will be accessible at the notebook's original URL."
+echo "--> Press CTRL+C to stop the server."
+python3 app.py
+
