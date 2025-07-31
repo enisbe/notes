@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+import sys
+import subprocess
+from pathlib import Path
+
+OUTPUT_FILE = "content.txt"
+
+def list_file_structure(files):
+    structure = ["root"]
+    for path in files:
+        for f in sorted(Path().glob(path)):
+            if f.is_file():
+                structure.append(f"|--{f}")
+    return "\n".join(structure) + "\n"
+
+def extract_file_contents(files):
+    blocks = []
+    for path in files:
+        for f in sorted(Path().glob(path)):
+            if f.is_file():
+                block = [
+                    "\n" + "#" * 22,
+                    f"file_name: {f}",
+                    "#" * 22,
+                ]
+                try:
+                    with f.open(encoding='utf-8', errors='replace') as file:
+                        block.append(file.read())
+                except Exception as e:
+                    block.append(f"[ERROR READING FILE: {e}]")
+                blocks.append("\n".join(block))
+    return "\n".join(blocks)
+
+def run_shell_commands(commands):
+    blocks = []
+    for cmd in commands:
+        block = [
+            "\n" + "#" * 30,
+            f"command_executed: {Path().resolve()}/{' '.join(cmd)}",
+            "#" * 30,
+        ]
+        try:
+            output = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            output = f"[ERROR] {e.output}"
+        block.append(output)
+        blocks.append("\n".join(block))
+    return "\n".join(blocks)
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: extract_context file_patterns... -- cmd1 'cmd2 with args'")
+        sys.exit(1)
+
+    # Separate file patterns from commands using --
+    if "--" in sys.argv:
+        split_idx = sys.argv.index("--")
+        file_patterns = sys.argv[1:split_idx]
+        commands = sys.argv[split_idx + 1:]
+    else:
+        file_patterns = sys.argv[1:]
+        commands = []
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as out:
+        out.write(list_file_structure(file_patterns))
+        out.write(extract_file_contents(file_patterns))
+        if commands:
+            out.write(run_shell_commands(commands))
+
+if __name__ == "__main__":
+    main()
