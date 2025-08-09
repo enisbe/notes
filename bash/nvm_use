@@ -8,3 +8,6 @@ nvm_use() {
 }
 
 alias nvm-use="nvm_use"
+
+
+cmd //c 'for %I in ("C:\Users\<name>\Dev Tools\nvm") do @echo %~sI'
