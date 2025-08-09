@@ -1,0 +1,10 @@
+nvm_use() {
+    local ver="$1"
+    # Call nvm normally
+    command nvm use "$ver"
+
+    # Fix PATH so Git Bash can see node/npm even with spaces in path
+    export PATH="$(cygpath -u "$NVM_SYMLINK"):$PATH"
+}
+
+alias nvm-use="nvm_use"
