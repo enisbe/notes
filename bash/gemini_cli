@@ -1,0 +1,126 @@
+ MSYS_NO_PATHCONV=1 docker run -it --rm --name gemini ^
+  -v "C:/Users/enisb/.gemini:/root/.gemini" ^
+  -v "C:/Users/enisb/gemini-projects:/opt/app/projects" ^
+  -e GOOGLE_CLOUD_PROJECT=gen-lang-client-0839142475 ^
+  weaponsforge/gemini-cli sh -lc 'printf "%s\n" "#!/bin/sh" "echo \"\$1\" >> /opt/app/projects/auth_url.txt" "echo Wrote OAuth URL to /opt/app/projects/auth_url.txt" > /tmp/url-logger.sh && chmod +x /tmp/url-logger.sh && BROWSER=/tmp/url-logger.sh gemini --debug'
+
+
+
+docker exec gemini sh -lc 'wget -qO- "http://localhost:34385/oauth2callback?state=0943084268f68f3a9760902933b20588778347e0f52c1ce9f17fd99b2155221b&code=4/0AVMBsJgNp-tD4rIl0lf-217pJsAALaxYnVVNq7dOuvYlzHuVT-bvq5P9sYBUXNs3QKk4zQ&scope=email%20profile%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&authuser=0&prompt=consent" >/dev/null 2>&1 || curl -s "docker exec gemini sh -lc 'wget -qO- "http://localhost:34385/oauth2callback?state=0943084268f68f3a9760902933b20588778347e0f52c1ce9f17fd99b2155221b&code=4/0AVMBsJgNp-tD4rIl0lf-217pJsAALaxYnVVNq7dOuvYlzHuVT-bvq5P9sYBUXNs3QKk4zQ&scope=email%20profile%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&authuser=0&prompt=consent" >/dev/null 2>&1 || curl -s "<PASTE_REDIRECT_URL_HERE>" >/dev/null'
+" >/dev/null'
+
+
+
+docker exec gemini sh -lc 'wget -qO- "http://localhost:34385/oauth2callback?state=0943084268f68f3a9760902933b20588778347e0f52c1ce9f17fd99b2155221b&code=4/0AVMBsJgNp-tD4rIl0lf-217pJsAALaxYnVVNq7dOuvYlzHuVT-bvq5P9sYBUXNs3QKk4zQ&scope=email%20profile%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&authuser=0&prompt=consent" >/dev/null 2>&1 || curl -s "http://localhost:34385/oauth2callback?state=0943084268f68f3a9760902933b20588778347e0f52c1ce9f17fd99b2155221b&code=4/0AVMBsJgNp-tD4rIl0lf-217pJsAALaxYnVVNq7dOuvYlzHuVT-bvq5P9sYBUXNs3QKk4zQ&scope=email%20profile%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&authuser=0&prompt=consent" >/dev/null'
+
+
+
+docker exec gemini sh -lc 'node -e "const http=require(\"http\"); const u=process.argv[1]; http.get(u, r=>{r.resume();}).on(\"error\", e=>{console.error(e.message); process.exit(1);});" "http://localhost:34385/oauth2callback?state=0943084268f68f3a9760902933b20588778347e0f52c1ce9f17fd99b2155221b&code=4/0AVMBsJgNp-tD4rIl0lf-217pJsAALaxYnVVNq7dOuvYlzHuVT-bvq5P9sYBUXNs3QKk4zQ&scope=email%20profile%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&authuser=0&prompt=consent"'
+
+
+
+docker exec gemini sh -lc 'node -e "const http=require(\"http\");const u=process.argv[1];http.get(u,r=>r.resume()).on(\"error\",e=>{console.error(e.message);process.exit(1);});" "http://localhost:44641/oauth2callback?state=dd9f50f8337d0c11b5273ed59c0c37d68b342819d64ac6bf3100e03c78e51b3c&code=4/0AVMBsJjCxvg6jiZqKotiR2GEiYIJLlSUAQ_3C9e7Rm8eexRzcBzy_TxdDl7lqeKUe7VTVQ&scope=email%20profile%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&authuser=0&prompt=consent"'
+
+
+
+docker exec gemini sh -lc 'curl -s "http://localhost:38405/oauth2callback?state=bd733be96df7b116fc0ef54cd5c34f13255d92ebc7e1b49d6ae1b827beac6ee7&code=4/0AVMBsJgU-nGaYqODo5agbK14uGnFlnBsXdsnQwvK9QFu2hgD94OmFBRzzxwMsXi_mhSxOA&scope=email%20profile%20https://www.googleapis.com/auth/cloud-platform%20https://www.googleapis.com/auth/userinfo.email%20https://www.googleapis.com/auth/userinfo.profile%20openid&authuser=0&prompt=consent" -o /dev/null || true'
+
+
+
+
+docker exec gemini sh -lc 'node -e "const http=require(\"http\");const u=process.argv[1];http.get(u,r=>r.resume()).on(\"error\",e=>{console.error(e.message);process.exit(1);});" "<url>"'
+
+This works 
+
+Step 1:
+# Only option where the link appears and was able to click on. Also this container I can do this but google container I cant (why?) 
+MSYS_NO_PATHCONV=1 docker run -it --rm --name gemini \
+  -v "C:/Users/enisb/.gemini:/home/node/.gemini" \
+  -e GOOGLE_CLOUD_PROJECT=gen-lang-client-0839142475 \
+  weaponsforge/gemini-cli sh -lc 'gemini --debug'
+  
+Step 2: 
+Click link and long in from step 1
+
+Step 3: 
+# Paste URL
+docker exec gemini sh -lc 'node -e "const http=require(\"http\");const u=process.argv[1];http.get(u,r=>r.resume()).on(\"error\",e=>{console.error(e.message);process.exit(1);});" "<url>"'
+
+
+Step 4; 
+MSYS_NO_PATHCONV=1 docker run --rm -it \
+    -v "$(echo ~)/.gemini":/home/node/.gemini \
+    -v "$(pwd)":/work \
+    -w /work \
+    us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.1.5-rc.0
+	
+	
+This above worked. I tried doing all with google container but I dont get the link (see full command below). Must be because I have to pass debug args? check docs how to run debug mode in container
+
+MSYS_NO_PATHCONV=1 docker run --rm -it \
+    -v "$(echo ~)/.gemini":/home/node/.gemini \
+    -v "$(pwd)":/work \
+    -w /work \
+	
+    us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.1.5-rc.0  sh -lc 'sh -lc '/usr/local/share/npm-global/bin/gemini --debug''
+------------------------------------------------------------------------------------------------
+
+docker exec gemini sh -lc 'node -e "const http=require(\"http\");const u=process.argv[1];http.get(u,r=>r.resume()).on(\"error\",e=>{console.error(e.message);process.exit(1);});" "<ur>"'
+ 
+ 
+ 
+ 
+ 
+
+MSYS_NO_PATHCONV=1 docker run -it --rm --name gemini \
+  -v "C:/Users/enisb/.gemini:/home/node/.gemini" \
+  -e GOOGLE_CLOUD_PROJECT=gen-lang-client-0839142475 \
+  weaponsforge/gemini-cli sh -lc 'gemini --debug'
+
+MSYS_NO_PATHCONV=1 docker run -it --rm --name gemini \
+  -v "C:/Users/enisb/.gemini:/home/node/.gemini" \
+  -e GOOGLE_CLOUD_PROJECT=gen-lang-client-0839142475 \
+  -e GOOGLE_GENAI_USE_VERTEXAI=true \
+  -e GOOGLE_CLOUD_LOCATION=us-central1 \
+  weaponsforge/gemini-cli sh -lc 'gemini --debug'
+
+
+MSYS_NO_PATHCONV=1 docker run -it --rm --name gemini   -v "C:/Users/enisb/.gemini:/home/node/.gemini" -v "$(pwd)":/work  -e GOOGLE_CLOUD_PROJECT=gen-lang-client-0839142475  weaponsforge/gemini-cli gemini
+ 
+
+MSYS_NO_PATHCONV=1 docker run -it --rm --name gemini \
+  -v "C:/Users/enisb/.gemini:/home/node/.gemini" \
+  -e GOOGLE_CLOUD_PROJECT=gen-lang-client-0839142475 \
+  weaponsforge/gemini-cli gemini
+
+ 
+MSYS_NO_PATHCONV=1 docker run --rm -it \
+    -v "$(echo ~)/.gemini":/home/node/.gemini \
+    -v "$(pwd)":/work \
+    -w /work \
+    us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.1.5-rc.0  sh -lc 'sh -lc '/usr/local/share/npm-global/bin/gemini --debug''
+	
+
+	MSYS_NO_PATHCONV=1 docker run --rm -it \
+    -e GOOGLE_CLOUD_PROJECT=gen-lang-client-0839142475 \
+    -e GOOGLE_GENAI_USE_VERTEXAI=true \
+    -e GOOGLE_CLOUD_LOCATION=us-central1 \
+    -v "$(echo ~)/.gemini":/home/node/.gemini \
+    -v "$(pwd)":/python/test-gemini \
+    -w //python/test-gemini \
+    us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.1.5-rc.0   
+	
+	
+MSYS_NO_PATHCONV=1 docker exec  -it gemini bash
+
+MSYS_NO_PATHCONV=1 docker exec  -it tender_benz bash
+
+
+ 
+MSYS_NO_PATHCONV=1 docker run --rm -it --name gemini\
+  -v "$(echo ~)/.gemini":/home/node/.gemini \
+  -v "$(pwd)":/work -w /work \
+  us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.1.5-rc.0 \
+  sh -lc 'export PATH=/usr/local/share/npm-global/bin:$PATH; gemini --debug'
+
+ 
